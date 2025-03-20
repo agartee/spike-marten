@@ -1,13 +1,6 @@
-﻿using FluentAssertions;
-using Marten;
-using Marten.Events.Projections;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Moq;
 using Spike.Domain.Commands;
-using Spike.Domain.Models;
-using Spike.Domain.Projections;
-using System;
-using Weasel.Core;
+using Spike.Domain.Services;
 
 namespace Spike.Domain.Tests.Commands
 {
@@ -16,36 +9,14 @@ namespace Spike.Domain.Tests.Commands
         [Fact]
         public async Task Handle_CreatesEventStreamAndProjections()
         {
-            //var configuration = new ConfigurationBuilder()
-            //.AddJsonFile("appsettings.json", optional: true)
-            //.AddEnvironmentVariables()
-            //.Build();
+            var repository = new Mock<ITimeOffRequestRepository>();
+            var handler = new CreateTimeOffRequestHandler(repository.Object);
 
-            var services = new ServiceCollection();
-
-            services.AddMarten(options =>
+            var result = await handler.Handle(new CreateTimeOffRequest
             {
-                options.Connection("host=localhost;database=mydatabase;username=admin;password=secret");
-                options.UseSystemTextJsonForSerialization();
-                options.AutoCreateSchemaObjects = AutoCreate.All;
-
-                // todo: add projections
-                options.Projections.Add<TimeOffRequestProjection>(ProjectionLifecycle.Inline);
-            });
-
-            var serviceProvider = services.BuildServiceProvider();
-            var documentStore = serviceProvider.GetRequiredService<IDocumentStore>();
-
-            var handler = new CreateTimeOffRequestHandler(documentStore);
-            //var result = await handler.Handle(new CreateTimeOffRequest
-            //{
-            //    Start = DateTime.Now,
-            //    End = DateTime.Now.AddDays(1)
-            //}, CancellationToken.None);
-
-            //result.Should().NotBeNull();
-
-            await handler.Testing();
+                Start = DateTime.Now,
+                End = DateTime.Now.AddDays(1)
+            }, CancellationToken.None);
         }
     }
 }
