@@ -7,5 +7,6 @@ namespace Spike.Domain.Events
         public required TimeOffRequestId Id { get; init; }
         public required DateTime Start { get; init; }
         public required DateTime End { get; init; }
+        public required TimeOffRequestStatus Status { get; init; }
     }
 }

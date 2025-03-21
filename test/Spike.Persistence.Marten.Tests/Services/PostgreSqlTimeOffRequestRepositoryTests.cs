@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Marten;
+using Marten.Events;
 using Marten.Events.Projections;
 using Microsoft.Extensions.DependencyInjection;
 using Spike.Domain.Models;
@@ -11,6 +12,8 @@ namespace Spike.Persistence.Marten.Tests.Services
 {
     public class PostgreSqlTimeOffRequestRepositoryTests
     {
+        private readonly Guid spikeId = new Guid("0195b9a5-8580-7c7b-bdf9-717eb0f4cb8c");
+
         private readonly PostgreSqlTimeOffRequestRepository repository;
 
         public PostgreSqlTimeOffRequestRepositoryTests()
@@ -22,8 +25,11 @@ namespace Spike.Persistence.Marten.Tests.Services
                 options.Connection("host=localhost;database=mydatabase;username=admin;password=secret");
                 options.UseSystemTextJsonForSerialization();
                 options.AutoCreateSchemaObjects = AutoCreate.All;
-
-                // todo: add projections
+                
+                // forces all GUIDs for IDs (instead of strings)
+                options.Events.StreamIdentity = StreamIdentity.AsGuid;
+                
+                // add projections
                 options.Projections.Add<TimeOffRequestProjection>(ProjectionLifecycle.Inline);
             });
 
@@ -37,6 +43,7 @@ namespace Spike.Persistence.Marten.Tests.Services
         public async Task Save_SavesStuff()
         {
             var timeOffRequest = new TimeOffRequest(TimeOffRequestId.New(), DateTime.Now, DateTime.Now.AddDays(1));
+            timeOffRequest.Cancel();
 
             await repository.Save(timeOffRequest, CancellationToken.None);
         }
@@ -44,7 +51,7 @@ namespace Spike.Persistence.Marten.Tests.Services
         [Fact]
         public async Task Hydrate_HydratesStuff()
         {
-            var id = new TimeOffRequestId(new Guid("0195b8e6-135a-7cd9-a789-c61d1d7b742b"));
+            var id = new TimeOffRequestId(spikeId);
 
             var timeOffRequest = await repository.Hydrate(id, null, CancellationToken.None);
 
@@ -54,7 +61,7 @@ namespace Spike.Persistence.Marten.Tests.Services
         [Fact]
         public async Task Get_GetsStuff()
         {
-            var id = new TimeOffRequestId(new Guid("0195b8e6-135a-7cd9-a789-c61d1d7b742b"));
+            var id = new TimeOffRequestId(spikeId);
 
             var timeOffRequest = await repository.Get(id, CancellationToken.None);
 

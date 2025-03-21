@@ -32,11 +32,11 @@ namespace Spike.Persistence.Marten.Services
             return result ?? throw new InvalidOperationException($"No aggregate found with ID {id}.");
         }
 
-        public async Task<TimeOffRequest> Get(TimeOffRequestId id, CancellationToken cancellationToken)
+        public async Task<TimeOffRequestInfo> Get(TimeOffRequestId id, CancellationToken cancellationToken)
         {
             await using var session = await store.LightweightSerializableSessionAsync(token: cancellationToken);
             
-            var result = await session.LoadAsync<TimeOffRequest>(id, token: cancellationToken);
+            var result = await session.LoadAsync<TimeOffRequestInfo>(id, token: cancellationToken);
 
             return result ?? throw new InvalidOperationException($"No projection found with ID {id}.");
         }

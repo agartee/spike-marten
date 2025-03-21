@@ -21,34 +21,55 @@ namespace Spike.Domain.Models
         public TimeOffRequestId? Id { get; private set; }
         public DateTime Start { get; private set; }
         public DateTime End { get; private set; }
+        public TimeOffRequestStatus Status { get; private set; }
 
-        public TimeOffRequest(TimeOffRequestId id, DateTime start, DateTime end)
+        private TimeOffRequest() { }
+
+        public TimeOffRequest(TimeOffRequestId id, DateTime start, DateTime end, TimeOffRequestStatus status = TimeOffRequestStatus.Pending)
         {
             var @event = new TimeOffRequestCreated
             {
                 Id = id,
                 Start = start,
-                End = end
+                End = end,
+                Status = status
             };
+
+            var timeOffRequest = new TimeOffRequest();
 
             Apply(@event);
             AddUncommittedEvent(@event);
         }
 
-        #region I don't like this... (Marten work-arounds for DDD behavior)
+        public void Cancel()
+        {
+            var @event = new TimeOffRequestCancelled();
+            
+            Apply(@event);
+            AddUncommittedEvent(@event);
+        }
 
-        [JsonConstructor]
-        private TimeOffRequest() { }
-
-        #endregion
-
-        public void Apply(TimeOffRequestCreated @event)
+        private void Apply(TimeOffRequestCreated @event)
         {
             Id = @event.Id;
             Start = @event.Start;
             End = @event.End;
-
+            Status = @event.Status;
             Version++;
         }
+
+        private void Apply(TimeOffRequestCancelled @event)
+        {
+            Status = TimeOffRequestStatus.Cancelled;
+            Version++;
+        }
+    }
+
+    public enum TimeOffRequestStatus
+    {
+        Pending,
+        Approved,
+        Denied,
+        Cancelled
     }
 }
