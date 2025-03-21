@@ -27,12 +27,10 @@ namespace Spike.Persistence.Marten.Tests.Services
             await repository.Save(timeOffRequest, CancellationToken.None);
 
             // read from event stream
-            repository = new PostgreSqlTimeOffRequestRepository(fixture.CreateDocumentStore());
             timeOffRequest = await repository.Hydrate(id, null, CancellationToken.None);
             timeOffRequest.Should().NotBeNull();
 
             // read from projection
-            repository = new PostgreSqlTimeOffRequestRepository(fixture.CreateDocumentStore());
             var timeOffRequestInfo = await repository.Get(id, CancellationToken.None);
             timeOffRequestInfo.Should().NotBeNull();
         }

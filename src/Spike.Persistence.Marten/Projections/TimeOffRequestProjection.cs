@@ -12,7 +12,8 @@ namespace Spike.Persistence.Marten.Projections
             {
                 Id = @event.Id,
                 Start = @event.Start,
-                End = @event.End
+                End = @event.End,
+                Status = @event.Status
             };
         }
 

@@ -25,7 +25,10 @@ namespace Spike.Domain.Models
 
         private TimeOffRequest() { }
 
-        public TimeOffRequest(TimeOffRequestId id, DateTime start, DateTime end, TimeOffRequestStatus status = TimeOffRequestStatus.Pending)
+        public TimeOffRequest(TimeOffRequestId id, 
+            DateTime start, 
+            DateTime end, 
+            TimeOffRequestStatus status = TimeOffRequestStatus.Pending)
         {
             var @event = new TimeOffRequestCreated
             {
