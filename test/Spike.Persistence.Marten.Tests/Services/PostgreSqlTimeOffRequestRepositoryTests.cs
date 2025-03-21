@@ -8,7 +8,7 @@ using Weasel.Core;
 
 namespace Spike.Persistence.Marten.Tests.Services
 {
-    public class MartenTimeOffRequestRepositoryTests
+    public class PostgreSqlTimeOffRequestRepositoryTests
     {
         [Fact]
         public async Task Save_SavesStuff()
@@ -22,15 +22,16 @@ namespace Spike.Persistence.Marten.Tests.Services
                 options.AutoCreateSchemaObjects = AutoCreate.All;
 
                 // todo: add projections
-                //options.Projections.Add<TimeOffRequestProjection>(ProjectionLifecycle.Inline);
+                options.Projections.Add<TimeOffRequestProjection>(ProjectionLifecycle.Inline);
             });
 
             var serviceProvider = services.BuildServiceProvider();
             var documentStore = serviceProvider.GetRequiredService<IDocumentStore>();
 
-            var repository = new MartenTimeOffRequestRepository(documentStore);
+            // our stuff!
+            var repository = new PostgreSqlTimeOffRequestRepository(documentStore);
 
-            var timeOffRequest = TimeOffRequest.Create(DateTime.Now, DateTime.Now.AddDays(1));
+            var timeOffRequest = new TimeOffRequest(TimeOffRequestId.New(), DateTime.Now, DateTime.Now.AddDays(1));
 
             await repository.Save(timeOffRequest, CancellationToken.None);
         }

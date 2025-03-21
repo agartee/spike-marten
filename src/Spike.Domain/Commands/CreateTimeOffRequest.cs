@@ -24,7 +24,7 @@ namespace Spike.Domain.Commands
             // note: validation should happen here, before the event is created
             // should we use the Guard pattern?
 
-            var timeOffRequest = TimeOffRequest.Create(request.Start, request.End);
+            var timeOffRequest = new TimeOffRequest(TimeOffRequestId.New(), request.Start, request.End);
 
             await timeOffRequestRepository.Save(timeOffRequest, cancellationToken);
 
