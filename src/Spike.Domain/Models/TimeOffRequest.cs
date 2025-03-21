@@ -35,6 +35,8 @@ namespace Spike.Domain.Models
             AddUncommittedEvent(@event);
         }
 
+        private TimeOffRequest() { }
+
         public void Apply(TimeOffRequestCreated @event)
         {
             Id = @event.Id;

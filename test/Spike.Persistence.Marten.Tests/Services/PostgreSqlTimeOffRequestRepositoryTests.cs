@@ -1,4 +1,5 @@
-﻿using Marten;
+﻿using FluentAssertions;
+using Marten;
 using Marten.Events.Projections;
 using Microsoft.Extensions.DependencyInjection;
 using Spike.Domain.Models;
@@ -10,8 +11,9 @@ namespace Spike.Persistence.Marten.Tests.Services
 {
     public class PostgreSqlTimeOffRequestRepositoryTests
     {
-        [Fact]
-        public async Task Save_SavesStuff()
+        private readonly PostgreSqlTimeOffRequestRepository repository;
+
+        public PostgreSqlTimeOffRequestRepositoryTests()
         {
             var services = new ServiceCollection();
 
@@ -28,12 +30,25 @@ namespace Spike.Persistence.Marten.Tests.Services
             var serviceProvider = services.BuildServiceProvider();
             var documentStore = serviceProvider.GetRequiredService<IDocumentStore>();
 
-            // our stuff!
-            var repository = new PostgreSqlTimeOffRequestRepository(documentStore);
+            repository = new PostgreSqlTimeOffRequestRepository(documentStore);
+        }
 
+        [Fact]
+        public async Task Save_SavesStuff()
+        {
             var timeOffRequest = new TimeOffRequest(TimeOffRequestId.New(), DateTime.Now, DateTime.Now.AddDays(1));
 
             await repository.Save(timeOffRequest, CancellationToken.None);
+        }
+
+        [Fact]
+        public async Task Hydrate_HydratesStuff()
+        {
+            var id = new TimeOffRequestId(new Guid("0195b8e6-135a-7cd9-a789-c61d1d7b742b"));
+
+            var timeOffRequest = await repository.Hydrate(id, null, CancellationToken.None);
+
+            timeOffRequest.Should().NotBeNull();
         }
     }
 }

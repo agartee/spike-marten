@@ -24,13 +24,12 @@ namespace Spike.Persistence.Marten.Services
             timeOffRequest.ClearUncommittedEvents();
         }
 
-        //public async Task<TAggregate> LoadAsync<TAggregate>(string id, int? version, CancellationToken cancellationToken) 
-        //    where TAggregate : AggregateBase
-        //{
-        //    await using var session = await store.LightweightSerializableSessionAsync(token: cancellationToken);
-        //    var aggregate = await session.Events.AggregateStreamAsync<TAggregate>(id, version ?? 0, token: cancellationToken);
+        public async Task<TimeOffRequest> Hydrate(TimeOffRequestId id, int? version, CancellationToken cancellationToken)
+        {
+            await using var session = await store.LightweightSerializableSessionAsync(token: cancellationToken);
+            var aggregate = await session.Events.AggregateStreamAsync<TimeOffRequest>(id.Value, version ?? 0, token: cancellationToken);
 
-        //    return aggregate ?? throw new InvalidOperationException($"No aggregate found with ID {id}.");
-        //}
+            return aggregate ?? throw new InvalidOperationException($"No aggregate found with ID {id}.");
+        }
     }
 }
