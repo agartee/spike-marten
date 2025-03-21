@@ -35,7 +35,12 @@ namespace Spike.Domain.Models
             AddUncommittedEvent(@event);
         }
 
+        #region I don't like this... (Marten work-arounds for DDD behavior)
+
+        [JsonConstructor]
         private TimeOffRequest() { }
+
+        #endregion
 
         public void Apply(TimeOffRequestCreated @event)
         {

@@ -27,9 +27,18 @@ namespace Spike.Persistence.Marten.Services
         public async Task<TimeOffRequest> Hydrate(TimeOffRequestId id, int? version, CancellationToken cancellationToken)
         {
             await using var session = await store.LightweightSerializableSessionAsync(token: cancellationToken);
-            var aggregate = await session.Events.AggregateStreamAsync<TimeOffRequest>(id.Value, version ?? 0, token: cancellationToken);
+            var result = await session.Events.AggregateStreamAsync<TimeOffRequest>(id.Value, version ?? 0, token: cancellationToken);
 
-            return aggregate ?? throw new InvalidOperationException($"No aggregate found with ID {id}.");
+            return result ?? throw new InvalidOperationException($"No aggregate found with ID {id}.");
+        }
+
+        public async Task<TimeOffRequest> Get(TimeOffRequestId id, CancellationToken cancellationToken)
+        {
+            await using var session = await store.LightweightSerializableSessionAsync(token: cancellationToken);
+            
+            var result = await session.LoadAsync<TimeOffRequest>(id, token: cancellationToken);
+
+            return result ?? throw new InvalidOperationException($"No projection found with ID {id}.");
         }
     }
 }

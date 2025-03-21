@@ -50,5 +50,15 @@ namespace Spike.Persistence.Marten.Tests.Services
 
             timeOffRequest.Should().NotBeNull();
         }
+
+        [Fact]
+        public async Task Get_GetsStuff()
+        {
+            var id = new TimeOffRequestId(new Guid("0195b8e6-135a-7cd9-a789-c61d1d7b742b"));
+
+            var timeOffRequest = await repository.Get(id, CancellationToken.None);
+
+            timeOffRequest.Should().NotBeNull();
+        }
     }
 }
